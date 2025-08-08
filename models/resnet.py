@@ -256,6 +256,7 @@ def _resnet(block: Type[BasicBlock], layers: List[int], weights: Optional[ResNet
     model = ResNet(block, layers, **kwargs)
 
     if weights is not None:
+        print("weights is not None")
         state_dict = weights.get_state_dict(progress=progress, check_hash=True)
         load_filtered_state_dict(model, state_dict)
 
@@ -279,9 +280,11 @@ def resnet34(*, pretrained: bool = True, progress: bool = True, **kwargs: Any) -
 
 
 def resnet50(*, pretrained: bool = True, progress: bool = True, **kwargs: Any) -> ResNet:
+    print("pretrained", pretrained)
     if pretrained:
         weights = ResNet50_Weights.DEFAULT
     else:
         weights = None
+    print("weights", weights)
 
     return _resnet(Bottleneck, [3, 4, 6, 3], weights, progress, **kwargs)
