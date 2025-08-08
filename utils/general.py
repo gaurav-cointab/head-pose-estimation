@@ -1,14 +1,13 @@
-import os
-import cv2
-import random
 import logging
-import numpy as np
+import os
+import random
+from typing import List
 import scipy.io as sio
 
+import cv2
+import numpy as np
 import torch
 import torch.distributed as distributed
-
-from typing import List
 
 
 # Custom filter to restrict logs to the main process
@@ -265,9 +264,10 @@ def compute_euler_angles_from_rotation_matrices(rotation_matrices):
     Returns:
         torch.Tensor: A tensor of shape (batch_size, 3) containing the Euler angles (x, y, z) for each rotation matrix in the batch.
     """
+    print(rotation_matrices)
     batch_size = rotation_matrices.shape[0]
     R = rotation_matrices
-    sy = torch.sqrt(R[:, 0, 0]**2 + R[:, 1, 0]**2)
+    sy = torch.sqrt(R[:, 0, 0] ** 2 + R[:, 1, 0] ** 2)
 
     is_singular = sy < 1e-6
 
@@ -402,7 +402,8 @@ def draw_cube(image: np.ndarray, yaw: float, pitch: float, roll: float, bbox: Li
     cv2.line(image, (x3, y3), (x3 + x2 - face_x, y3 + y2 - face_y), color=green, thickness=2)
 
 
-def draw_axis(image: np.ndarray, yaw: float, pitch: float, roll: float, bbox: List[int], size_ratio: float = 0.5) -> None:
+def draw_axis(image: np.ndarray, yaw: float, pitch: float, roll: float, bbox: List[int],
+              size_ratio: float = 0.5) -> None:
     """
     Draws 3D coordinate axes on a 2D image based on yaw, pitch, and roll angles.
 
