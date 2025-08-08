@@ -41,7 +41,7 @@ def initModel(params):
 def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Head pose estimation inference.')
-    parser.add_argument("--network", type=str, default="resnet18", help="Model name, default `resnet18`")
+    parser.add_argument("--network", type=str, default="resnet50", help="Model name, default `resnet50`")
     parser.add_argument(
         "--input",
         type=str,
@@ -64,7 +64,8 @@ def parse_args():
         choices=['cube', 'axis'],
         help="Draw cube or axis for head pose"
     )
-    parser.add_argument('--weights', type=str, required=True, help='Path to head pose estimation model weights')
+    parser.add_argument('--weights', type=str, default="./weights/resnet50.pt", required=True,
+                        help='Path to head pose estimation model weights')
     parser.add_argument("--output", type=str, default="output.mp4", help="Path to save output file")
 
     return parser.parse_args()
