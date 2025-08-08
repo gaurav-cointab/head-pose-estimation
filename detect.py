@@ -1,11 +1,14 @@
 import argparse
+import glob
 import logging
+import os
 import time
 import warnings
 
 import cv2
 import numpy as np
 import torch
+import tqdm
 from torchvision import transforms
 
 from models import get_model, SCRFD
@@ -175,10 +178,22 @@ def main_video(params):
     cv2.destroyAllWindows()
 
 
-def main_image(params):
-    global device
+def main_folder(params):
     initModel(params)
-    global head_pose, face_detector
+    images = sorted(glob.glob(os.path.join(args.folder, "**", "*.jpg")))
+    for image in tqdm(images):
+        main_image({
+            "image": image
+        })
+
+
+def main_image(params):
+    if params.network:
+        global device
+        initModel(params)
+        global head_pose, face_detector
+    else:
+        global device, head_pose, face_detector
 
     with torch.no_grad():
         frame = cv2.imread(params.image)
@@ -195,7 +210,6 @@ def main_image(params):
 
             start = time.time()
             rotation_matrix = head_pose(image)
-            logging.info('Head pose estimation: %.2f ms' % ((time.time() - start) * 1000))
 
             euler = np.degrees(compute_euler_angles_from_rotation_matrices(rotation_matrix))
             p_pred_deg = euler[:, 0].cpu()
@@ -211,5 +225,7 @@ if __name__ == '__main__':
     args = parse_args()
     if args.input:
         main_video(args)
-    else:
+    elif args.image:
         main_image(args)
+    elif args.folder:
+        main_folder(args)
