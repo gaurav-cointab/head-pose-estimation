@@ -264,7 +264,6 @@ def compute_euler_angles_from_rotation_matrices(rotation_matrices):
     Returns:
         torch.Tensor: A tensor of shape (batch_size, 3) containing the Euler angles (x, y, z) for each rotation matrix in the batch.
     """
-    print(rotation_matrices)
     batch_size = rotation_matrices.shape[0]
     R = rotation_matrices
     sy = torch.sqrt(R[:, 0, 0] ** 2 + R[:, 1, 0] ** 2)
