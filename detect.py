@@ -13,7 +13,7 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from models import get_model, SCRFD
-from utils.general import compute_euler_angles_from_rotation_matrices, draw_cube, draw_axis
+from utils.general import compute_euler_angles_from_rotation_matrices
 
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
@@ -46,28 +46,10 @@ def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Head pose estimation inference.')
     parser.add_argument("--network", type=str, default="resnet50", help="Model name, default `resnet50`")
-    parser.add_argument(
-        "--input",
-        type=str,
-        help="Path to input video file or camera id"
-    )
-    parser.add_argument(
-        "--image",
-        type=str,
-        help="Path to image file"
-    )
-    parser.add_argument(
-        "--folder",
-        type=str,
-        help="Path to folder with images"
-    )
-    parser.add_argument(
-        "--draw-type",
-        type=str,
-        default='cube',
-        choices=['cube', 'axis'],
-        help="Draw cube or axis for head pose"
-    )
+    parser.add_argument("--input", type=str, help="Path to input video file or camera id")
+    parser.add_argument("--image", type=str, help="Path to image file")
+    parser.add_argument("--images", type=str, default=None, help="Paths to images")
+    parser.add_argument("--folder", type=str, help="Path to folder with images")
     parser.add_argument('--weights', type=str, default="weights/resnet50.pt",
                         help='Path to head pose estimation model weights')
     parser.add_argument("--output", type=str, default="output.mp4", help="Path to save output file")
@@ -151,25 +133,6 @@ def main_video(params):
                 y_pred_deg = euler[:, 1].cpu()
                 r_pred_deg = euler[:, 2].cpu()
 
-                if args.draw_type == "cube":
-                    draw_cube(
-                        frame,
-                        y_pred_deg,
-                        p_pred_deg,
-                        r_pred_deg,
-                        bbox=[x_min, y_min, x_max, y_max],
-                        size=width
-                    )
-                else:
-                    draw_axis(
-                        frame,
-                        y_pred_deg,
-                        p_pred_deg,
-                        r_pred_deg,
-                        bbox=[x_min, y_min, x_max, y_max],
-                        size_ratio=0.5
-                    )
-            # Write the frame to the video file if saving
             if params.output:
                 out.write(frame)
 
@@ -181,10 +144,17 @@ def main_video(params):
 
 def main_folder(params):
     initModel(params)
-    images = sorted(glob.glob(os.path.join(params.folder, "*.jpg")))
+    if params.images:
+        images = sorted(params.images)
+    else:
+        images = sorted(glob.glob(os.path.join(params.folder, "**", "*.jpg")))
+    res = []
     for image in tqdm(images):
-        obj = SimpleNamespace(image=image, network=None)
-        main_image(obj)
+        res.append({
+            image: image,
+            res: main_image(SimpleNamespace(image=image, network=None))
+        })
+    return res
 
 
 def main_image(params):
@@ -216,9 +186,11 @@ def main_image(params):
             y_pred_deg = euler[:, 1].cpu()
             r_pred_deg = euler[:, 2].cpu()
 
-            print("Yaw:", y_pred_deg)
-            print("Pitch:", p_pred_deg)
-            print("Roll:", r_pred_deg)
+            return {
+                "yaw": y_pred_deg,
+                "pitch": p_pred_deg,
+                "roll": r_pred_deg,
+            }
 
 
 if __name__ == '__main__':
@@ -226,6 +198,10 @@ if __name__ == '__main__':
     if args.input:
         main_video(args)
     elif args.image:
-        main_image(args)
-    elif args.folder:
-        main_folder(args)
+        res = main_image(args)
+        print(res)
+    elif args.folder or args.images:
+        if args.images:
+            args.images = args.images.split(',')
+        res = main_folder(args)
+        print(res)
