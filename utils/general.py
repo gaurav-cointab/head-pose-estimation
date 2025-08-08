@@ -269,7 +269,7 @@ def compute_euler_angles_from_rotation_matrices(rotation_matrices):
     R = rotation_matrices
     sy = torch.sqrt(R[:, 0, 0] ** 2 + R[:, 1, 0] ** 2)
 
-    is_singular = sy < 1e-6
+    is_singular = sy < 0.03
 
     x_angle = torch.atan2(R[:, 2, 1], R[:, 2, 2])
     y_angle = torch.atan2(-R[:, 2, 0], sy)
