@@ -8,8 +8,8 @@ import warnings
 import cv2
 import numpy as np
 import torch
-import tqdm
 from torchvision import transforms
+from tqdm import tqdm
 
 from models import get_model, SCRFD
 from utils.general import compute_euler_angles_from_rotation_matrices, draw_cube, draw_axis
@@ -181,9 +181,9 @@ def main_video(params):
 def main_folder(params):
     initModel(params)
     images = sorted(glob.glob(os.path.join(args.folder, "**", "*.jpg")))
-    for i in tqdm(range(len(images))):
+    for image in tqdm(images):
         main_image({
-            "image": images[i]
+            "image": image
         })
 
 
