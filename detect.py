@@ -181,9 +181,9 @@ def main_video(params):
 def main_folder(params):
     initModel(params)
     images = sorted(glob.glob(os.path.join(args.folder, "**", "*.jpg")))
-    for image in tqdm(images):
+    for i in tqdm(range(len(images))):
         main_image({
-            "image": image
+            "image": images[i]
         })
 
 
