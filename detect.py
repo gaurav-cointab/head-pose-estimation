@@ -4,6 +4,7 @@ import logging
 import os
 import time
 import warnings
+from types import SimpleNamespace
 
 import cv2
 import numpy as np
@@ -182,9 +183,7 @@ def main_folder(params):
     initModel(params)
     images = sorted(glob.glob(os.path.join(params.folder, "*.jpg")))
     for image in tqdm(images):
-        obj = {}
-        obj.image = image
-        obj.network = None
+        obj = SimpleNamespace(image=image, network=None)
         main_image(obj)
 
 
