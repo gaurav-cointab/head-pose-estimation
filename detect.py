@@ -182,10 +182,10 @@ def main_folder(params):
     initModel(params)
     images = sorted(glob.glob(os.path.join(params.folder, "*.jpg")))
     for image in tqdm(images):
-        main_image({
-            "image": image,
-            "network": None,
-        })
+        obj = {}
+        obj.image = image
+        obj.network = None
+        main_image(obj)
 
 
 def main_image(params):
