@@ -151,8 +151,8 @@ def main_folder(params):
     res = []
     for image in tqdm(images):
         res.append({
-            image: image,
-            res: main_image(SimpleNamespace(image=image, network=None))
+            "image": image,
+            "res": main_image(SimpleNamespace(image=image, network=None))
         })
     return res
 
