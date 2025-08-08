@@ -1,8 +1,8 @@
+from typing import Any, Callable, List, Optional, Type, Tuple, Union
+
 import torch
 from torch import nn, Tensor
 from torchvision.models import ResNet18_Weights, ResNet34_Weights, ResNet50_Weights
-
-from typing import Any, Callable, List, Optional, Type, Tuple
 
 from utils.general import compute_rotation_matrix_from_ortho6d
 from .common import load_filtered_state_dict
@@ -82,15 +82,15 @@ class Bottleneck(nn.Module):
     expansion: int = 4
 
     def __init__(
-        self,
-        inplanes: int,
-        planes: int,
-        stride: int = 1,
-        downsample: Optional[nn.Module] = None,
-        groups: int = 1,
-        base_width: int = 64,
-        dilation: int = 1,
-        norm_layer: Optional[Callable[..., nn.Module]] = None,
+            self,
+            inplanes: int,
+            planes: int,
+            stride: int = 1,
+            downsample: Optional[nn.Module] = None,
+            groups: int = 1,
+            base_width: int = 64,
+            dilation: int = 1,
+            norm_layer: Optional[Callable[..., nn.Module]] = None,
     ) -> None:
         super().__init__()
         if norm_layer is None:
@@ -133,7 +133,7 @@ class Bottleneck(nn.Module):
 class ResNet(nn.Module):
     def __init__(
             self,
-            block: Type[BasicBlock | Bottleneck],
+            block: Type[Union[BasicBlock, Bottleneck]],
             layers: List[int],
             num_classes: int = 1000,
             groups: int = 1,
@@ -184,7 +184,7 @@ class ResNet(nn.Module):
 
     def _make_layer(
             self,
-            block: Type[BasicBlock | Bottleneck],
+            block: Type[Union[BasicBlock, Bottleneck]],
             planes: int,
             blocks: int,
             stride: int = 1,
@@ -251,7 +251,8 @@ class ResNet(nn.Module):
         return compute_rotation_matrix_from_ortho6d(x)
 
 
-def _resnet(block: Type[BasicBlock], layers: List[int], weights: Optional[ResNet34_Weights], progress: bool, **kwargs: Any) -> ResNet:
+def _resnet(block: Type[BasicBlock], layers: List[int], weights: Optional[ResNet34_Weights], progress: bool,
+            **kwargs: Any) -> ResNet:
     model = ResNet(block, layers, **kwargs)
 
     if weights is not None:
