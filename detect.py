@@ -64,7 +64,7 @@ def parse_args():
         choices=['cube', 'axis'],
         help="Draw cube or axis for head pose"
     )
-    parser.add_argument('--weights', type=str, default="./weights/resnet50.pt", required=True,
+    parser.add_argument('--weights', type=str, default="weights/resnet50.pt",
                         help='Path to head pose estimation model weights')
     parser.add_argument("--output", type=str, default="output.mp4", help="Path to save output file")
 
